@@ -1,0 +1,47 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens (roadmap Section 16).
+ * In Tailwind v4 the theme lives here rather than in a JS config file. Every
+ * token below is auto-exposed as a utility class: --color-accent becomes
+ * bg-accent / text-accent / border-accent, --font-display becomes font-display.
+ */
+@theme {
+  --color-bg: #121214;
+  --color-surface: #1c1c20;
+  --color-line: #2a2a30;
+
+  --color-accent: #ff3b7f;
+  --color-positive: #26e5c7;
+  --color-warning: #f5a623;
+
+  --color-ink: #ededef;
+  --color-muted: #8b8b93;
+
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    /* Tells the browser to render native UI (scrollbars, form controls) dark */
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+}
