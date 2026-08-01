@@ -8,9 +8,9 @@ dist-ssr/
 # Test coverage reports
 coverage/
 
-# Secrets — every .env file is ignored EXCEPT the blank .env.example template
-.env
-.env.*
+# Secrets — every .env file is ignored EXCEPT the blank .env.example template.
+# Order matters: the negation must come after the pattern it carves out of.
+.env*
 !.env.example
 
 # Vercel CLI local state

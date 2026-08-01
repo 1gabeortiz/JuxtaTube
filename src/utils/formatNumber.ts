@@ -5,10 +5,11 @@ const UNITS = [
 ] as const;
 
 /**
- * Compact display form: 12500 -> "12.5K", 2484720 -> "2.5M".
+ * Compact display form: 10800 -> "10.8K", 2484720 -> "2.5M".
  *
- * One decimal below 10 and none above it, so values stay a predictable width
- * in a grid of stat cards rather than jittering between "9.4K" and "948.2K".
+ * Keeps one decimal until the scaled value reaches 100, which matches how
+ * YouTube itself renders counts. Dropping the decimal any earlier would round
+ * 10,800 subscribers to a visibly wrong "11K".
  */
 export function formatNumber(value: number): string {
   if (!Number.isFinite(value)) return '—';
@@ -19,7 +20,7 @@ export function formatNumber(value: number): string {
   for (const { threshold, suffix } of UNITS) {
     if (abs >= threshold) {
       const scaled = value / threshold;
-      const digits = Math.abs(scaled) < 10 ? 1 : 0;
+      const digits = Math.abs(scaled) < 100 ? 1 : 0;
       return `${scaled.toFixed(digits).replace(/\.0$/, '')}${suffix}`;
     }
   }
