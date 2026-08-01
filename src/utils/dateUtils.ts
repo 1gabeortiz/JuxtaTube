@@ -26,7 +26,13 @@ export function formatRelativeDate(iso: string): string {
   return '';
 }
 
-/** "2026-04-26T02:45:25Z" -> "Apr 26, 2026". */
+/**
+ * "2026-04-26T02:45:25Z" -> "Apr 26, 2026".
+ *
+ * Rendered in UTC on purpose. YouTube timestamps are UTC, and converting to a
+ * local timezone shifts early-morning ones onto the previous day — a channel
+ * created 2015-03-28T03:41Z would otherwise display as Mar 27 in the Americas.
+ */
 export function formatAbsoluteDate(iso: string): string {
   const timestamp = Date.parse(iso);
   if (Number.isNaN(timestamp)) return '';
@@ -35,5 +41,6 @@ export function formatAbsoluteDate(iso: string): string {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
+    timeZone: 'UTC',
   }).format(timestamp);
 }
