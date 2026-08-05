@@ -1,5 +1,8 @@
 import type { ApiErrorResponse } from '../../src/api/types';
 import { MissingEnvError } from './env';
+import { NotConnectedError } from './getAccessToken';
+import { OAuthError } from './googleOAuth';
+import { SupabaseError } from './supabase';
 import { YouTubeApiError } from './youtubeDataApi';
 
 /**
@@ -16,6 +19,17 @@ export function jsonOk(data: unknown, seconds = 600): Response {
       'Cache-Control': `s-maxage=${seconds}, stale-while-revalidate=${seconds * 2}`,
     },
   });
+}
+
+/**
+ * Success response that must never be cached.
+ *
+ * Connection state changes the instant the owner connects or disconnects. If
+ * the CDN cached it, the UI would keep showing a stale "not connected" state
+ * for minutes after a successful authorization.
+ */
+export function jsonNoStore(data: unknown): Response {
+  return Response.json(data, { headers: { 'Cache-Control': 'no-store' } });
 }
 
 export function jsonError(message: string, status: number): Response {
@@ -36,6 +50,20 @@ export function toErrorResponse(error: unknown): Response {
 
   if (error instanceof MissingEnvError) {
     return jsonError('Server is not configured correctly.', 500);
+  }
+
+  // 409 rather than 401: the request was well-formed, the app just has no
+  // stored connection yet. The UI uses this to show the Connect button.
+  if (error instanceof NotConnectedError) {
+    return jsonError('Channel is not connected. Connect it to load this data.', 409);
+  }
+
+  if (error instanceof OAuthError) {
+    return jsonError(error.message, 502);
+  }
+
+  if (error instanceof SupabaseError) {
+    return jsonError('Could not reach the database.', 502);
   }
 
   if (error instanceof YouTubeApiError) {

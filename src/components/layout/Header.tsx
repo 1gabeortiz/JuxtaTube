@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { ConnectChannelButton } from '../auth/ConnectChannelButton';
 import { Nav } from './Nav';
 
 export function Header() {
@@ -8,7 +9,11 @@ export function Header() {
         <Link to="/" className="font-display text-xl font-bold tracking-tight">
           Juxta<span className="text-accent">Tube</span>
         </Link>
-        <Nav />
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
+          <Nav />
+          <ConnectChannelButton />
+        </div>
       </div>
     </header>
   );

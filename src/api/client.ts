@@ -17,8 +17,8 @@ export class ApiError extends Error {
  * header. Components never call fetch directly; they go through a hook, which
  * goes through here. That keeps error handling consistent in one place.
  */
-export async function fetchJson<T>(path: string): Promise<T> {
-  const response = await fetch(path);
+export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(path, init);
 
   if (!response.ok) {
     let message = `Request failed with status ${response.status}`;
@@ -32,4 +32,12 @@ export async function fetchJson<T>(path: string): Promise<T> {
   }
 
   return (await response.json()) as T;
+}
+
+export function postJson<T>(path: string, body?: unknown): Promise<T> {
+  return fetchJson<T>(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body ?? {}),
+  });
 }
