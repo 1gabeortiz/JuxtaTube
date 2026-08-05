@@ -3,6 +3,7 @@ import { MissingEnvError } from './env.js';
 import { NotConnectedError } from './getAccessToken.js';
 import { OAuthError } from './googleOAuth.js';
 import { SupabaseError } from './supabase.js';
+import { AnalyticsApiError } from './youtubeAnalyticsApi.js';
 import { YouTubeApiError } from './youtubeDataApi.js';
 
 /**
@@ -64,6 +65,23 @@ export function toErrorResponse(error: unknown): Response {
 
   if (error instanceof SupabaseError) {
     return jsonError('Could not reach the database.', 502);
+  }
+
+  if (error instanceof AnalyticsApiError) {
+    if (error.status === 401) {
+      return jsonError('Your Google authorization expired. Reconnect the channel.', 401);
+    }
+    // 403 here almost always means the stored token belongs to a different
+    // channel than YT_CHANNEL_ID, or consent was granted without both scopes.
+    if (error.status === 403) {
+      return jsonError(
+        'Google refused this analytics request. The connected account may not ' +
+          'own this channel — disconnect and reconnect, choosing the right ' +
+          'channel on the consent screen.',
+        403,
+      );
+    }
+    return jsonError('YouTube Analytics request failed.', 502);
   }
 
   if (error instanceof YouTubeApiError) {

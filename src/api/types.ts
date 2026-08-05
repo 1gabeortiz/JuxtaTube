@@ -39,6 +39,69 @@ export interface VideosResponse {
   videos: VideoSummary[];
 }
 
+/** One day of channel performance. `date` is YYYY-MM-DD. */
+export interface AnalyticsDayPoint {
+  date: string;
+  views: number;
+  estimatedMinutesWatched: number;
+  subscribersGained: number;
+  subscribersLost: number;
+}
+
+export interface AnalyticsTotals {
+  views: number;
+  estimatedMinutesWatched: number;
+  subscribersGained: number;
+  subscribersLost: number;
+  /** Gained minus lost — the number that actually moved your subscriber count. */
+  netSubscribers: number;
+}
+
+export interface AnalyticsOverview {
+  startDate: string;
+  endDate: string;
+  totals: AnalyticsTotals;
+  days: AnalyticsDayPoint[];
+}
+
+export interface AgeGenderSlice {
+  /** Google's bucket label, e.g. "age18-24". */
+  ageGroup: string;
+  /** "male", "female", or "user_specified". */
+  gender: string;
+  /** Share of views, 0–100. Does not sum to 100 per gender. */
+  viewerPercentage: number;
+}
+
+export interface CountrySlice {
+  /** ISO 3166-1 alpha-2 code, e.g. "US". */
+  code: string;
+  views: number;
+  estimatedMinutesWatched: number;
+}
+
+export interface Demographics {
+  startDate: string;
+  endDate: string;
+  ageGender: AgeGenderSlice[];
+  countries: CountrySlice[];
+}
+
+export interface TrafficSourceSlice {
+  /** Google's raw enum, e.g. "YT_SEARCH". */
+  source: string;
+  /** Readable form, e.g. "YouTube search". */
+  label: string;
+  views: number;
+  estimatedMinutesWatched: number;
+}
+
+export interface TrafficSources {
+  startDate: string;
+  endDate: string;
+  sources: TrafficSourceSlice[];
+}
+
 export interface AuthStatus {
   connected: boolean;
   /** ISO timestamp of when the connection was last written, or null. */
