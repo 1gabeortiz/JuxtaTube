@@ -1,5 +1,5 @@
-import { refreshAccessToken } from './googleOAuth';
-import { getTokenRow, updateTokenRow } from './supabase';
+import { refreshAccessToken } from './googleOAuth.js';
+import { getTokenRow, updateTokenRow } from './supabase.js';
 
 export class NotConnectedError extends Error {
   constructor() {

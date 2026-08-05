@@ -1,9 +1,9 @@
-import type { ApiErrorResponse } from '../../src/api/types';
-import { MissingEnvError } from './env';
-import { NotConnectedError } from './getAccessToken';
-import { OAuthError } from './googleOAuth';
-import { SupabaseError } from './supabase';
-import { YouTubeApiError } from './youtubeDataApi';
+import type { ApiErrorResponse } from '../../src/api/types.js';
+import { MissingEnvError } from './env.js';
+import { NotConnectedError } from './getAccessToken.js';
+import { OAuthError } from './googleOAuth.js';
+import { SupabaseError } from './supabase.js';
+import { YouTubeApiError } from './youtubeDataApi.js';
 
 /**
  * Success response with a caching hint for Vercel's CDN.

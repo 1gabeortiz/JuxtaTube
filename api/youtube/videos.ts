@@ -1,6 +1,6 @@
-import type { VideoSummary, VideosResponse } from '../../src/api/types';
-import { requireEnv } from '../_lib/env';
-import { jsonError, jsonOk, toErrorResponse } from '../_lib/respond';
+import type { VideoSummary, VideosResponse } from '../../src/api/types.js';
+import { requireEnv } from '../_lib/env.js';
+import { jsonError, jsonOk, toErrorResponse } from '../_lib/respond.js';
 import {
   bestThumbnail,
   toCount,
@@ -9,7 +9,7 @@ import {
   type RawChannel,
   type RawPlaylistItem,
   type RawVideo,
-} from '../_lib/youtubeDataApi';
+} from '../_lib/youtubeDataApi.js';
 
 const DEFAULT_LIMIT = 12;
 // videos.list accepts at most 50 IDs per call, so one page is the ceiling here.

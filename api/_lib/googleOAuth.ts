@@ -1,4 +1,4 @@
-import { requireEnv } from './env';
+import { requireEnv } from './env.js';
 
 const TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token';
 const REVOKE_ENDPOINT = 'https://oauth2.googleapis.com/revoke';

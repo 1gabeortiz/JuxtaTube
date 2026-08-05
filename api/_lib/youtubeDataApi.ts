@@ -1,4 +1,4 @@
-import { requireEnv } from './env';
+import { requireEnv } from './env.js';
 
 const DATA_API_BASE = 'https://www.googleapis.com/youtube/v3';
 

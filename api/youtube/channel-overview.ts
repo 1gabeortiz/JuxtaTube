@@ -1,13 +1,13 @@
-import type { ChannelOverview } from '../../src/api/types';
-import { requireEnv } from '../_lib/env';
-import { jsonError, jsonOk, toErrorResponse } from '../_lib/respond';
+import type { ChannelOverview } from '../../src/api/types.js';
+import { requireEnv } from '../_lib/env.js';
+import { jsonError, jsonOk, toErrorResponse } from '../_lib/respond.js';
 import {
   bestThumbnail,
   toCount,
   youtubeDataRequest,
   type ListResponse,
   type RawChannel,
-} from '../_lib/youtubeDataApi';
+} from '../_lib/youtubeDataApi.js';
 
 export default {
   async fetch(): Promise<Response> {
