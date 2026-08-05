@@ -1,4 +1,5 @@
 import { requireEnv } from './env.js';
+import { getValidAccessToken } from './getAccessToken.js';
 
 const DATA_API_BASE = 'https://www.googleapis.com/youtube/v3';
 
@@ -26,6 +27,34 @@ export async function youtubeDataRequest<T>(
   url.searchParams.set('key', requireEnv('YT_DATA_API_KEY'));
 
   const response = await fetch(url);
+  if (!response.ok) {
+    throw new YouTubeApiError(response.status);
+  }
+
+  return (await response.json()) as T;
+}
+
+/**
+ * Same Data API, but authorized as the channel owner instead of by API key.
+ *
+ * A few parts — `suggestions` most notably — are only returned for videos the
+ * authenticated user owns. An API key proves which *app* is calling; only OAuth
+ * proves *who* is calling, which is what Google requires here.
+ */
+export async function youtubeDataRequestAuthed<T>(
+  resource: string,
+  params: Record<string, string>,
+): Promise<T> {
+  const accessToken = await getValidAccessToken();
+
+  const url = new URL(`${DATA_API_BASE}/${resource}`);
+  for (const [key, value] of Object.entries(params)) {
+    url.searchParams.set(key, value);
+  }
+
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
   if (!response.ok) {
     throw new YouTubeApiError(response.status);
   }
@@ -89,6 +118,29 @@ export interface RawVideo {
     commentCount?: string;
   };
   contentDetails: { duration: string };
+}
+
+/** One tag YouTube itself recommends for an owned video. */
+export interface RawTagSuggestion {
+  tag: string;
+  categoryRestricts?: string[];
+}
+
+export interface RawVideoSuggestions {
+  id: string;
+  snippet?: {
+    title: string;
+    channelId: string;
+    tags?: string[];
+  };
+  suggestions?: {
+    tagSuggestions?: RawTagSuggestion[];
+  };
+}
+
+/** search.list nests the id, unlike videos.list where it is a plain string. */
+export interface RawSearchResult {
+  id?: { videoId?: string };
 }
 
 export interface ListResponse<T> {
