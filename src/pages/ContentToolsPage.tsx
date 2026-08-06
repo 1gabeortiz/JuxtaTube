@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { ApiError } from '../api/client';
+import { isLocked, isNotConnected } from '../api/client';
 import { ChartCard } from '../components/analytics/ChartCard';
 import { TagChips } from '../components/content/TagChips';
 import { TagCopyBox } from '../components/content/TagCopyBox';
 import { TagFrequencyList } from '../components/content/TagFrequencyList';
 import { ErrorCard } from '../components/ui/ErrorCard';
+import { LockedNotice } from '../components/ui/LockedNotice';
 import { useMyVideos } from '../hooks/useMyVideos';
 import {
   useTagExplorer,
@@ -14,10 +15,6 @@ import {
 } from '../hooks/useContentTools';
 
 const VIDEO_CHOICES = 25;
-
-function isNotConnected(error: unknown): boolean {
-  return error instanceof ApiError && error.status === 409;
-}
 
 /** Official suggestions require OAuth, so this panel needs a connected channel. */
 function TagSuggestionsPanel() {
@@ -61,7 +58,12 @@ function TagSuggestionsPanel() {
         ) : null}
 
         {suggestions.isError ? (
-          isNotConnected(suggestions.error) ? (
+          isLocked(suggestions.error) ? (
+            <p className="text-sm text-muted">
+              Unlock owner mode from the header to see these. YouTube releases tag
+              suggestions only to the video&rsquo;s owner.
+            </p>
+          ) : isNotConnected(suggestions.error) ? (
             <p className="text-sm text-muted">
               Connect your channel from the header to see these. YouTube releases
               tag suggestions only to the video&rsquo;s owner.
@@ -163,8 +165,9 @@ function TagExplorerPanel() {
           ) : (
             <>
               Costs <span className="font-mono text-warning">101</span> quota
-              units, because open-ended search is the one thing YouTube has no
-              cheap endpoint for. About 100 searches a day is the ceiling.
+                units, because open-ended search is the one thing YouTube has no
+                cheap endpoint for. About 100 searches a day is the ceiling, which
+                is why this mode needs owner mode.
             </>
           )}
         </p>
@@ -190,10 +193,17 @@ function TagExplorerPanel() {
 
       <div className="mt-6">
         {explorer.isError ? (
-          <ErrorCard
-            message={explorer.error.message}
-            onRetry={() => void explorer.refetch()}
-          />
+          isLocked(explorer.error) ? (
+            <LockedNotice
+              what="Keyword search"
+              reason="Each keyword search spends 101 of the 10,000 quota units YouTube grants this app per day, so an open endpoint could exhaust it in a few minutes. Channel search costs 3 units and stays open to everyone."
+            />
+          ) : (
+            <ErrorCard
+              message={explorer.error.message}
+              onRetry={() => void explorer.refetch()}
+            />
+          )
         ) : null}
 
         {explorer.data ? (

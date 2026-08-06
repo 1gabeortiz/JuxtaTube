@@ -1,4 +1,5 @@
 import { exchangeCodeForTokens } from '../_lib/googleOAuth.js';
+import { requireOwner } from '../_lib/requireOwner.js';
 import { jsonError, jsonNoStore, toErrorResponse } from '../_lib/respond.js';
 import {
   getConnectionRow,
@@ -21,6 +22,11 @@ export default {
     }
 
     try {
+      // Without this, a stranger could complete the OAuth flow with their own
+      // Google account and overwrite the single stored token row, pointing the
+      // whole app at their channel.
+      requireOwner(request);
+
       const body = (await request.json()) as { code?: unknown };
       const code = typeof body.code === 'string' ? body.code.trim() : '';
       if (!code) {

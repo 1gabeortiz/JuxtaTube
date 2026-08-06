@@ -1,4 +1,5 @@
 import { useAuthStatus, useConnectChannel, useDisconnectChannel } from '../../hooks/useAuth';
+import { useOwnerMode } from '../../hooks/useOwnerMode';
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Something went wrong.';
@@ -12,11 +13,32 @@ function errorMessage(error: unknown): string {
  */
 export function ConnectChannelButton() {
   const status = useAuthStatus();
+  const { isUnlocked } = useOwnerMode();
   const connect = useConnectChannel();
   const disconnect = useDisconnectChannel();
 
   if (status.isPending) {
     return <div className="h-9 w-32 animate-pulse rounded-lg bg-surface" />;
+  }
+
+  /**
+   * Connecting and disconnecting both rewrite the single stored token row, so
+   * both routes require the owner key. A visitor gets the state as read-only
+   * rather than a button that would walk them through Google's consent screen
+   * only to fail at the final step.
+   */
+  if (!isUnlocked) {
+    return (
+      <span className="flex items-center gap-2 text-sm text-muted">
+        <span
+          aria-hidden="true"
+          className={`size-2 rounded-full ${
+            status.data?.connected ? 'bg-positive' : 'bg-line'
+          }`}
+        />
+        {status.data?.connected ? 'Channel connected' : 'No channel connected'}
+      </span>
+    );
   }
 
   const actionError = connect.error ?? disconnect.error;

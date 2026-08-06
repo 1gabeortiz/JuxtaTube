@@ -1,6 +1,7 @@
 import type { TrafficSourceSlice, TrafficSources } from '../../src/api/types.js';
 import { parseDays, resolveDateRange } from '../_lib/dateRange.js';
-import { jsonError, jsonOk, toErrorResponse } from '../_lib/respond.js';
+import { requireOwner } from '../_lib/requireOwner.js';
+import { jsonError, jsonPrivate, toErrorResponse } from '../_lib/respond.js';
 import {
   analyticsReport,
   rowsToObjects,
@@ -57,6 +58,8 @@ export default {
     }
 
     try {
+      requireOwner(request);
+
       const url = new URL(request.url);
       const range = resolveDateRange(parseDays(url.searchParams.get('days')));
 
@@ -84,7 +87,7 @@ export default {
         sources,
       };
 
-      return jsonOk(payload, 1800);
+      return jsonPrivate(payload, 1800);
     } catch (error) {
       return toErrorResponse(error);
     }

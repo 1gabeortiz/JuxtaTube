@@ -6,6 +6,7 @@ import {
   MAX_TRACKED,
 } from '../_lib/competitorStore.js';
 import { SupabaseError } from '../_lib/postgrest.js';
+import { requireOwner } from '../_lib/requireOwner.js';
 import { jsonError, jsonNoStore, toErrorResponse } from '../_lib/respond.js';
 import {
   bestThumbnail,
@@ -65,6 +66,8 @@ async function handleGet(): Promise<Response> {
 
 /** Adds a channel by ID or @handle, resolving its real title first. */
 async function handlePost(request: Request): Promise<Response> {
+  requireOwner(request);
+
   const body = (await request.json()) as { channel?: unknown };
   const input = typeof body.channel === 'string' ? body.channel.trim() : '';
   if (input === '') {
@@ -104,6 +107,8 @@ async function handlePost(request: Request): Promise<Response> {
 }
 
 async function handleDelete(request: Request): Promise<Response> {
+  requireOwner(request);
+
   const channelId = new URL(request.url).searchParams.get('channelId')?.trim() ?? '';
   if (channelId === '') {
     return jsonError('Provide a channelId to remove.', 400);

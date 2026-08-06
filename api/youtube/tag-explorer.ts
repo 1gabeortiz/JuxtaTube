@@ -1,5 +1,6 @@
 import type { TagExplorerResult, TagFrequency } from '../../src/api/types.js';
-import { jsonError, jsonOk, toErrorResponse } from '../_lib/respond.js';
+import { requireOwner } from '../_lib/requireOwner.js';
+import { jsonError, jsonOk, jsonPrivate, toErrorResponse } from '../_lib/respond.js';
 import {
   channelLookupParam,
   youtubeDataRequest,
@@ -160,8 +161,14 @@ export default {
       }
 
       if (keyword) {
+        // Gated purely on cost, not privacy: the results are public data, but at
+        // 101 units a call an open endpoint lets a stranger exhaust the entire
+        // 10,000-unit daily quota in about a hundred requests and take the rest
+        // of the app down with it. Channel mode above stays open at 3 units.
+        requireOwner(request);
+
         const result = await exploreKeyword(keyword);
-        return jsonOk(result, 86_400);
+        return jsonPrivate(result, 86_400);
       }
 
       return jsonError('Provide either a channel or a keyword.', 400);
