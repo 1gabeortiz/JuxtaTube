@@ -2,7 +2,7 @@ import type { ApiErrorResponse } from '../../src/api/types.js';
 import { MissingEnvError } from './env.js';
 import { NotConnectedError } from './getAccessToken.js';
 import { OAuthError } from './googleOAuth.js';
-import { SupabaseError } from './supabase.js';
+import { SupabaseError } from './postgrest.js';
 import { AnalyticsApiError } from './youtubeAnalyticsApi.js';
 import { YouTubeApiError } from './youtubeDataApi.js';
 

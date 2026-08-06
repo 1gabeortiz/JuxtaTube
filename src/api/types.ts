@@ -39,6 +39,43 @@ export interface VideosResponse {
   videos: VideoSummary[];
 }
 
+export interface Competitor {
+  channelId: string;
+  channelName: string;
+  addedAt: string;
+  thumbnailUrl: string;
+  /** Null when YouTube no longer returns the channel, e.g. it was deleted. */
+  subscriberCount: number | null;
+  hiddenSubscriberCount: boolean;
+  viewCount: number | null;
+  videoCount: number | null;
+}
+
+export interface CompetitorsResponse {
+  competitors: Competitor[];
+  /** Ceiling imposed by batching every channel into one API call. */
+  maxTracked: number;
+}
+
+export interface CompetitorSnapshotPoint {
+  /** YYYY-MM-DD. */
+  date: string;
+  subscriberCount: number | null;
+  viewCount: number | null;
+  videoCount: number | null;
+}
+
+export interface CompetitorHistory {
+  channelId: string;
+  channelName: string;
+  points: CompetitorSnapshotPoint[];
+}
+
+export interface CompetitorHistoryResponse {
+  startDate: string;
+  histories: CompetitorHistory[];
+}
+
 export interface TagSuggestion {
   tag: string;
   /** Video categories the tag is considered relevant to. Often empty. */

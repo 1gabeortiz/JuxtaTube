@@ -148,6 +148,20 @@ export interface ListResponse<T> {
   nextPageToken?: string;
 }
 
+/** Channel IDs are always "UC" followed by 22 URL-safe base64 characters. */
+const CHANNEL_ID_PATTERN = /^UC[A-Za-z0-9_-]{22}$/;
+
+/**
+ * Builds the channels.list parameter for either a raw channel ID or an @handle.
+ *
+ * Both are supported because nobody has a channel ID memorized, but handles are
+ * what people actually copy out of a YouTube URL.
+ */
+export function channelLookupParam(input: string): Record<string, string> {
+  if (CHANNEL_ID_PATTERN.test(input)) return { id: input };
+  return { forHandle: input.startsWith('@') ? input : `@${input}` };
+}
+
 /** Highest-resolution thumbnail available, falling back down the ladder. */
 export function bestThumbnail(thumbnails: Thumbnails): string {
   return (
