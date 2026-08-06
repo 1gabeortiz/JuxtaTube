@@ -1,0 +1,32 @@
+name: Daily Competitor Snapshot
+
+on:
+  schedule:
+    # 13:00 UTC daily. GitHub's scheduler is best-effort and can run late under
+    # load, which is fine here: the job records one row per calendar day, so
+    # drifting by an hour changes nothing.
+    - cron: '0 13 * * *'
+  # Lets the job be triggered by hand from the Actions tab, which is the only
+  # practical way to test it without waiting for tomorrow.
+  workflow_dispatch:
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # The script has no dependencies, but npm ci keeps the environment
+      # reproducible and matches how the rest of CI installs.
+      - run: npm ci
+
+      - run: node scripts/snapshotCompetitors.mjs
+        env:
+          YT_DATA_API_KEY: ${{ secrets.YT_DATA_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

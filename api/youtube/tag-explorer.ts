@@ -1,6 +1,7 @@
 import type { TagExplorerResult, TagFrequency } from '../../src/api/types.js';
 import { jsonError, jsonOk, toErrorResponse } from '../_lib/respond.js';
 import {
+  channelLookupParam,
   youtubeDataRequest,
   type ListResponse,
   type RawChannel,
@@ -14,8 +15,6 @@ const MAX_VIDEOS = 50;
 
 /** Enough to spot patterns without producing an unreadable wall of chips. */
 const MAX_TAGS = 60;
-
-const CHANNEL_ID_PATTERN = /^UC[A-Za-z0-9_-]{22}$/;
 
 // Quota costs per the Data API pricing table: reads are 1 unit, search is 100.
 const COST_LIST = 1;
@@ -71,19 +70,13 @@ async function fetchTagsForVideos(videoIds: string[]): Promise<VideoTags[]> {
   return data.items ?? [];
 }
 
-/**
- * Channel mode — 3 units via the uploads-playlist pattern.
- *
- * Accepts either a raw channel ID or an @handle, because nobody has a channel ID
- * memorized but everybody knows the handle.
- */
+/** Channel mode — 3 units via the uploads-playlist pattern. */
 async function exploreChannel(input: string): Promise<TagExplorerResult> {
-  const isId = CHANNEL_ID_PATTERN.test(input);
   const channelData = await youtubeDataRequest<
     ListResponse<Pick<RawChannel, 'snippet' | 'contentDetails'>>
   >('channels', {
     part: 'snippet,contentDetails',
-    ...(isId ? { id: input } : { forHandle: input.startsWith('@') ? input : `@${input}` }),
+    ...channelLookupParam(input),
   });
 
   const channel = channelData.items?.[0];
