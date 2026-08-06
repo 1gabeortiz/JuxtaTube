@@ -4,7 +4,7 @@ import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
 import { ChartSkeleton } from './components/ui/LoadingSkeletons';
 import { OverviewPage } from './pages/OverviewPage';
-import { ContentToolsPage } from './pages/ContentToolsPage';
+import { TagsPage } from './pages/TagsPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 /**
@@ -44,7 +44,7 @@ export default function App() {
               </Suspense>
             }
           />
-          <Route path="/content-tools" element={<ContentToolsPage />} />
+          <Route path="/tags" element={<TagsPage />} />
           <Route
             path="/competitors"
             element={
