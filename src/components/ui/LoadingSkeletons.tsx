@@ -15,6 +15,15 @@ export function StatCardSkeleton() {
   );
 }
 
+export function ChartSkeleton() {
+  return (
+    <div className="rounded-xl border border-line bg-surface p-5">
+      <Shimmer className="h-5 w-40" />
+      <Shimmer className="mt-4 h-64 w-full" />
+    </div>
+  );
+}
+
 export function VideoCardSkeleton() {
   return (
     <div className="overflow-hidden rounded-xl border border-line bg-surface">
