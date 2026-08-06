@@ -39,6 +39,12 @@ export interface VideosResponse {
   videos: VideoSummary[];
 }
 
+export interface AuthStatus {
+  connected: boolean;
+  /** ISO timestamp of when the connection was last written, or null. */
+  connectedAt: string | null;
+}
+
 /** Uniform error body returned by every /api route when something goes wrong. */
 export interface ApiErrorResponse {
   error: string;
