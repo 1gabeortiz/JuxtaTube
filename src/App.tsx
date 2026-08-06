@@ -5,17 +5,24 @@ import { Footer } from './components/layout/Footer';
 import { ChartSkeleton } from './components/ui/LoadingSkeletons';
 import { OverviewPage } from './pages/OverviewPage';
 import { ContentToolsPage } from './pages/ContentToolsPage';
-import { CompetitorsPage } from './pages/CompetitorsPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 /**
- * Analytics is loaded on demand because it pulls in Recharts, which is larger
- * than the rest of the app combined. Importing it eagerly would make every
- * visitor download the charting library just to read the Overview page.
+ * The two charting pages are loaded on demand because they pull in Recharts,
+ * which is larger than the rest of the app combined. Importing either eagerly
+ * would make every visitor download the charting library just to read the
+ * Overview page. Vite factors the shared library into its own chunk, so opening
+ * the second of these pages does not download it twice.
  */
 const AnalyticsPage = lazy(() =>
   import('./pages/AnalyticsPage').then((module) => ({
     default: module.AnalyticsPage,
+  })),
+);
+
+const CompetitorsPage = lazy(() =>
+  import('./pages/CompetitorsPage').then((module) => ({
+    default: module.CompetitorsPage,
   })),
 );
 
@@ -38,7 +45,14 @@ export default function App() {
             }
           />
           <Route path="/content-tools" element={<ContentToolsPage />} />
-          <Route path="/competitors" element={<CompetitorsPage />} />
+          <Route
+            path="/competitors"
+            element={
+              <Suspense fallback={<ChartSkeleton />}>
+                <CompetitorsPage />
+              </Suspense>
+            }
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>

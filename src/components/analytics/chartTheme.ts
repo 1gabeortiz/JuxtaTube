@@ -12,6 +12,28 @@ export const CHART_COLORS = {
   line: 'var(--color-line)',
 } as const;
 
+/**
+ * Colors for charts with one line per tracked channel.
+ *
+ * Starts with the two theme accents, then continues through hues that hold up on
+ * the dark surface. Assigned by index and wrapped, so tracking more channels than
+ * there are colors repeats rather than rendering something invisible.
+ */
+export const SERIES_COLORS = [
+  'var(--color-accent)',
+  'var(--color-positive)',
+  'var(--color-warning)',
+  '#7c8cff',
+  '#c77dff',
+  '#4ade80',
+  '#fb7185',
+  '#38bdf8',
+] as const;
+
+export function seriesColor(index: number): string {
+  return SERIES_COLORS[index % SERIES_COLORS.length] ?? SERIES_COLORS[0];
+}
+
 export const AXIS_PROPS = {
   stroke: 'var(--color-muted)',
   fontSize: 11,
