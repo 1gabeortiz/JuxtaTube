@@ -1,5 +1,7 @@
-import { describe, expect, it, vi } from 'vitest';
-import { ApiError, fetchJson, postJson } from './client';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { clearOwnerKey, setOwnerKey } from '../lib/ownerKey';
+import { ApiError, fetchJson, isLocked, isNotConnected, postJson } from './client';
+import { OWNER_KEY_HEADER } from './headers';
 
 /**
  * A hand-rolled stand-in for Response.
@@ -22,6 +24,16 @@ function stubFetch(response: Response) {
   return fetchMock;
 }
 
+/** The headers the client actually sent, as a plain object. */
+function sentHeaders(fetchMock: ReturnType<typeof stubFetch>): Record<string, string> {
+  const init = fetchMock.mock.calls[0]?.[1];
+  return Object.fromEntries(new Headers(init?.headers).entries());
+}
+
+afterEach(() => {
+  clearOwnerKey();
+});
+
 describe('fetchJson', () => {
   it('returns the parsed body on success', async () => {
     stubFetch(fakeResponse({ subscriberCount: 10_800 }));
@@ -41,14 +53,13 @@ describe('fetchJson', () => {
     );
   });
 
-  it('attaches the status code so callers can branch on it', async () => {
-    stubFetch(fakeResponse({ error: 'nope' }, 409));
+  it('carries the status and code through so callers can branch on them', async () => {
+    stubFetch(fakeResponse({ error: 'nope', code: 'not_connected' }, 409));
 
-    // 409 is what the Analytics page checks to show its Connect prompt instead
-    // of a generic failure card.
     await expect(fetchJson('/api/auth/status')).rejects.toMatchObject({
       name: 'ApiError',
       status: 409,
+      code: 'not_connected',
     });
   });
 
@@ -73,17 +84,64 @@ describe('fetchJson', () => {
   });
 });
 
+describe('owner key handling', () => {
+  it('sends no owner header while locked', async () => {
+    const fetchMock = stubFetch(fakeResponse({}));
+
+    await fetchJson('/api/analytics/overview');
+
+    expect(sentHeaders(fetchMock)).not.toHaveProperty(OWNER_KEY_HEADER);
+  });
+
+  it('attaches the stored key once unlocked', async () => {
+    setOwnerKey('secret-key');
+    const fetchMock = stubFetch(fakeResponse({}));
+
+    await fetchJson('/api/analytics/overview');
+
+    expect(sentHeaders(fetchMock)[OWNER_KEY_HEADER]).toBe('secret-key');
+  });
+
+  // This is what lets the unlock form verify a candidate key before saving it,
+  // so a wrong guess never gets written to sessionStorage.
+  it('lets an explicit header override the stored key', async () => {
+    setOwnerKey('old-key');
+    const fetchMock = stubFetch(fakeResponse({ owner: true }));
+
+    await fetchJson('/api/auth/owner', {
+      headers: { [OWNER_KEY_HEADER]: 'candidate-key' },
+    });
+
+    expect(sentHeaders(fetchMock)[OWNER_KEY_HEADER]).toBe('candidate-key');
+  });
+});
+
+describe('error predicates', () => {
+  it('identifies a locked route', () => {
+    expect(isLocked(new ApiError('private', 401, 'locked'))).toBe(true);
+    expect(isLocked(new ApiError('expired', 401))).toBe(false);
+  });
+
+  it('identifies a missing channel connection', () => {
+    expect(isNotConnected(new ApiError('nope', 409, 'not_connected'))).toBe(true);
+    expect(isNotConnected(new ApiError('conflict', 409))).toBe(false);
+  });
+
+  it('ignores errors that did not come from the API', () => {
+    expect(isLocked(new Error('network down'))).toBe(false);
+    expect(isNotConnected(null)).toBe(false);
+  });
+});
+
 describe('postJson', () => {
   it('sends a JSON body with the matching content type', async () => {
     const fetchMock = stubFetch(fakeResponse({ channelId: 'UC123' }));
 
     await postJson('/api/youtube/competitors', { channel: '@someone' });
 
-    expect(fetchMock).toHaveBeenCalledWith('/api/youtube/competitors', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: '{"channel":"@someone"}',
-    });
+    const init = fetchMock.mock.calls[0]?.[1];
+    expect(init).toMatchObject({ method: 'POST', body: '{"channel":"@someone"}' });
+    expect(sentHeaders(fetchMock)['content-type']).toBe('application/json');
   });
 
   it('sends an empty object when there is no body', async () => {

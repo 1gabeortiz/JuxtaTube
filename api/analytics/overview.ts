@@ -4,7 +4,8 @@ import type {
   AnalyticsTotals,
 } from '../../src/api/types.js';
 import { parseDays, resolveDateRange } from '../_lib/dateRange.js';
-import { jsonError, jsonOk, toErrorResponse } from '../_lib/respond.js';
+import { requireOwner } from '../_lib/requireOwner.js';
+import { jsonError, jsonPrivate, toErrorResponse } from '../_lib/respond.js';
 import {
   analyticsReport,
   rowsToObjects,
@@ -24,6 +25,10 @@ export default {
     }
 
     try {
+      // Inside the try so the thrown UnauthorizedError becomes a 401 response
+      // rather than an unhandled crash.
+      requireOwner(request);
+
       const url = new URL(request.url);
       const range = resolveDateRange(parseDays(url.searchParams.get('days')));
 
@@ -71,7 +76,7 @@ export default {
 
       // 30 minutes is generous: the newest day in this range is already two days
       // old, so a fresher fetch could not return different numbers.
-      return jsonOk(payload, 1800);
+      return jsonPrivate(payload, 1800);
     } catch (error) {
       return toErrorResponse(error);
     }

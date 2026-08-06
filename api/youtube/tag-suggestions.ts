@@ -1,6 +1,7 @@
 import type { TagSuggestions } from '../../src/api/types.js';
 import { requireEnv } from '../_lib/env.js';
-import { jsonError, jsonOk, toErrorResponse } from '../_lib/respond.js';
+import { requireOwner } from '../_lib/requireOwner.js';
+import { jsonError, jsonPrivate, toErrorResponse } from '../_lib/respond.js';
 import {
   youtubeDataRequestAuthed,
   type ListResponse,
@@ -25,6 +26,10 @@ export default {
     }
 
     try {
+      // Owner-only regardless of the gate: YouTube returns suggestions only for
+      // videos the authenticated account uploaded.
+      requireOwner(request);
+
       const videoId = new URL(request.url).searchParams.get('videoId')?.trim() ?? '';
       if (!VIDEO_ID_PATTERN.test(videoId)) {
         return jsonError('Provide a valid videoId.', 400);
@@ -60,7 +65,7 @@ export default {
         })),
       };
 
-      return jsonOk(payload, 3600);
+      return jsonPrivate(payload, 3600);
     } catch (error) {
       return toErrorResponse(error);
     }

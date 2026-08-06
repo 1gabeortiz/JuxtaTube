@@ -1,5 +1,6 @@
 import type { Competitor } from '../../api/types';
 import { useRemoveCompetitor } from '../../hooks/useCompetitors';
+import { useOwnerMode } from '../../hooks/useOwnerMode';
 import { formatNumber } from '../../utils/formatNumber';
 
 interface CompetitorCardProps {
@@ -21,6 +22,7 @@ function Stat({ label, value }: { label: string; value: number | null }) {
 
 export function CompetitorCard({ competitor, color }: CompetitorCardProps) {
   const remove = useRemoveCompetitor();
+  const { isUnlocked } = useOwnerMode();
 
   return (
     <div className="animate-rise rounded-xl border border-line bg-surface p-5">
@@ -55,15 +57,17 @@ export function CompetitorCard({ competitor, color }: CompetitorCardProps) {
           </a>
         </div>
 
-        <button
-          type="button"
-          onClick={() => remove.mutate(competitor.channelId)}
-          disabled={remove.isPending}
-          aria-label={`Stop tracking ${competitor.channelName}`}
-          className="shrink-0 rounded-lg border border-line px-2 py-1 text-xs text-muted transition-colors hover:border-warning hover:text-warning disabled:opacity-50"
-        >
-          {remove.isPending ? '…' : 'Remove'}
-        </button>
+        {isUnlocked ? (
+          <button
+            type="button"
+            onClick={() => remove.mutate(competitor.channelId)}
+            disabled={remove.isPending}
+            aria-label={`Stop tracking ${competitor.channelName}`}
+            className="shrink-0 rounded-lg border border-line px-2 py-1 text-xs text-muted transition-colors hover:border-warning hover:text-warning disabled:opacity-50"
+          >
+            {remove.isPending ? '…' : 'Remove'}
+          </button>
+        ) : null}
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-3">

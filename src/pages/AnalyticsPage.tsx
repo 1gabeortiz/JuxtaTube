@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ApiError } from '../api/client';
+import { isLocked, isNotConnected } from '../api/client';
 import { AgeGenderChart } from '../components/analytics/AgeGenderChart';
 import { ChartCard } from '../components/analytics/ChartCard';
 import { CountryBreakdown } from '../components/analytics/CountryBreakdown';
@@ -9,6 +9,7 @@ import { WatchTimeChart } from '../components/analytics/WatchTimeChart';
 import { StatCard } from '../components/overview/StatCard';
 import { ErrorCard } from '../components/ui/ErrorCard';
 import { ChartSkeleton, StatCardSkeleton } from '../components/ui/LoadingSkeletons';
+import { LockedNotice } from '../components/ui/LockedNotice';
 import {
   useAnalyticsOverview,
   useDemographics,
@@ -19,13 +20,9 @@ import { formatAbsoluteDate } from '../utils/dateUtils';
 import { formatWatchTime } from '../utils/formatWatchTime';
 
 /**
- * The backend returns 409 when no channel is connected. That is a state to
- * explain, not an error to apologize for, so it gets its own panel.
+ * A missing connection is a state to explain, not an error to apologize for, so
+ * it gets its own panel.
  */
-function isNotConnected(error: unknown): boolean {
-  return error instanceof ApiError && error.status === 409;
-}
-
 function NotConnectedNotice() {
   return (
     <div className="rounded-xl border border-dashed border-line bg-surface/50 p-10 text-center">
@@ -46,7 +43,12 @@ export function AnalyticsPage() {
   const demographics = useDemographics(days);
   const traffic = useTrafficSources(days);
 
-  // Any one of the three reveals a missing connection; they all use the token.
+  // Any one of the three reveals either state; they all need the same key and
+  // the same token. Locked is checked first because it fails earlier — a locked
+  // request never gets far enough to discover whether a channel is connected.
+  const locked =
+    isLocked(overview.error) || isLocked(demographics.error) || isLocked(traffic.error);
+
   const notConnected =
     isNotConnected(overview.error) ||
     isNotConnected(demographics.error) ||
@@ -66,10 +68,16 @@ export function AnalyticsPage() {
           </p>
         </div>
 
-        {notConnected ? null : <RangeSelector value={days} onChange={setDays} />}
+        {locked || notConnected ? null : (
+          <RangeSelector value={days} onChange={setDays} />
+        )}
       </div>
 
-      {notConnected ? (
+      {locked ? (
+        <div className="mt-8">
+          <LockedNotice what="This channel's analytics" />
+        </div>
+      ) : notConnected ? (
         <div className="mt-8">
           <NotConnectedNotice />
         </div>

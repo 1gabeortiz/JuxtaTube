@@ -175,7 +175,18 @@ export interface AuthStatus {
   connectedAt: string | null;
 }
 
+/**
+ * Machine-readable reason for a failure, for the cases the UI has to react to
+ * rather than merely display.
+ *
+ * Status codes alone are not enough: an Analytics route can return 401 because
+ * owner mode is locked or because Google's token expired, and those need
+ * different UI. The code disambiguates without overloading HTTP semantics.
+ */
+export type ApiErrorCode = 'locked' | 'not_connected';
+
 /** Uniform error body returned by every /api route when something goes wrong. */
 export interface ApiErrorResponse {
   error: string;
+  code?: ApiErrorCode;
 }

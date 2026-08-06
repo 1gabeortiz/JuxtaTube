@@ -1,4 +1,5 @@
 import { revokeToken } from '../_lib/googleOAuth.js';
+import { requireOwner } from '../_lib/requireOwner.js';
 import { jsonError, jsonNoStore, toErrorResponse } from '../_lib/respond.js';
 import { deleteTokenRow, getTokenRow } from '../_lib/supabase.js';
 
@@ -17,6 +18,8 @@ export default {
     }
 
     try {
+      requireOwner(request);
+
       const row = await getTokenRow();
       if (row) {
         await revokeToken(row.refresh_token);

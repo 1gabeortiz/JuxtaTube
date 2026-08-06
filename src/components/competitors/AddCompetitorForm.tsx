@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAddCompetitor } from '../../hooks/useCompetitors';
+import { useOwnerMode } from '../../hooks/useOwnerMode';
 
 interface AddCompetitorFormProps {
   trackedCount: number;
@@ -12,6 +13,7 @@ export function AddCompetitorForm({
 }: AddCompetitorFormProps) {
   const [input, setInput] = useState('');
   const add = useAddCompetitor();
+  const { isUnlocked } = useOwnerMode();
 
   const atLimit = trackedCount >= maxTracked;
 
@@ -24,6 +26,20 @@ export function AddCompetitorForm({
       // Clear only on success, so a rejected value stays visible to correct.
       onSuccess: () => setInput(''),
     });
+  }
+
+  // The tracked list is shared state that drives a daily scheduled job, so
+  // changing it is owner-only. Reading it stays public.
+  if (!isUnlocked) {
+    return (
+      <div className="rounded-xl border border-line bg-surface p-5">
+        <p className="text-sm">Tracking {trackedCount} channels</p>
+        <p className="mt-1 text-xs text-muted">
+          Stats and history below are public. Adding or removing a channel changes
+          what the daily snapshot job records, so it needs owner mode.
+        </p>
+      </div>
+    );
   }
 
   return (

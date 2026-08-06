@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
 import { ConnectChannelButton } from '../auth/ConnectChannelButton';
+import { OwnerModeButton } from '../auth/OwnerModeButton';
 import { Nav } from './Nav';
 
 export function Header() {
@@ -12,7 +13,10 @@ export function Header() {
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
           <Nav />
-          <ConnectChannelButton />
+          <div className="flex items-center gap-3">
+            <OwnerModeButton />
+            <ConnectChannelButton />
+          </div>
         </div>
       </div>
     </header>
