@@ -12,7 +12,7 @@ import {
   useTagSuggestions,
   type ExplorerMode,
   type ExplorerSearch,
-} from '../hooks/useContentTools';
+} from '../hooks/useTags';
 
 const VIDEO_CHOICES = 25;
 
@@ -121,7 +121,7 @@ function TagExplorerPanel() {
   const explorer = useTagExplorer(search);
 
   // Submitting explicitly, rather than searching as you type, is a cost decision:
-  // in keyword mode every request spends 100 of 10,000 daily quota units.
+  // in keyword mode every request spends 101 of 10,000 daily quota units.
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     const query = input.trim();
@@ -165,9 +165,9 @@ function TagExplorerPanel() {
           ) : (
             <>
               Costs <span className="font-mono text-warning">101</span> quota
-                units, because open-ended search is the one thing YouTube has no
-                cheap endpoint for. About 100 searches a day is the ceiling, which
-                is why this mode needs owner mode.
+              units, because open-ended search is the one thing YouTube has no
+              cheap endpoint for. About 100 searches a day is the ceiling, which
+              is why this mode needs owner mode.
             </>
           )}
         </p>
@@ -177,7 +177,9 @@ function TagExplorerPanel() {
             type="text"
             value={input}
             onChange={(event) => setInput(event.target.value)}
-            placeholder={mode === 'channel' ? '@channelhandle or UC…' : 'dark type beat'}
+            placeholder={
+              mode === 'channel' ? '@channelhandle or UC…' : 'beginner camera setup'
+            }
             aria-label={mode === 'channel' ? 'Channel ID or handle' : 'Keyword'}
             className="min-w-0 flex-1 rounded-lg border border-line bg-bg px-3 py-2 text-sm"
           />
@@ -236,10 +238,10 @@ function TagExplorerPanel() {
   );
 }
 
-export function ContentToolsPage() {
+export function TagsPage() {
   return (
     <section>
-      <h1 className="text-3xl">Content tools</h1>
+      <h1 className="text-3xl">Tags</h1>
       <p className="mt-2 max-w-2xl text-muted">
         Two different questions about tags: what YouTube recommends for your own
         video, and what other creators in your niche are actually using.

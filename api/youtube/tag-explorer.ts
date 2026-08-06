@@ -28,7 +28,7 @@ type VideoTags = Pick<RawVideo, 'id' | 'snippet'>;
  * Ranks tags by how many videos use them.
  *
  * Counting is case-insensitive and deduplicated per video, so a single video
- * repeating "type beat" cannot inflate the ranking. The first spelling seen is
+ * repeating one phrase cannot inflate the ranking. The first spelling seen is
  * kept for display, since tags are shown to a human.
  */
 function rankTags(videos: VideoTags[]): TagFrequency[] {

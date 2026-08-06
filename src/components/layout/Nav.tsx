@@ -4,7 +4,7 @@ const LINKS = [
   // `end` stops the "/" link from matching every route, since every path starts with "/"
   { to: '/', label: 'Overview', end: true },
   { to: '/analytics', label: 'Analytics', end: false },
-  { to: '/content-tools', label: 'Content Tools', end: false },
+  { to: '/tags', label: 'Tags', end: false },
   { to: '/competitors', label: 'Competitors', end: false },
 ];
 
