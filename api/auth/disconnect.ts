@@ -1,6 +1,6 @@
-import { revokeToken } from '../_lib/googleOAuth';
-import { jsonError, jsonNoStore, toErrorResponse } from '../_lib/respond';
-import { deleteTokenRow, getTokenRow } from '../_lib/supabase';
+import { revokeToken } from '../_lib/googleOAuth.js';
+import { jsonError, jsonNoStore, toErrorResponse } from '../_lib/respond.js';
+import { deleteTokenRow, getTokenRow } from '../_lib/supabase.js';
 
 /**
  * Disconnects the channel: tells Google to invalidate the grant, then deletes
@@ -10,21 +10,23 @@ import { deleteTokenRow, getTokenRow } from '../_lib/supabase';
  * refresh token would stay valid on Google's side with no record of it here —
  * a live credential we could no longer revoke.
  */
-export default async function handler(request: Request): Promise<Response> {
-  if (request.method !== 'POST') {
-    return jsonError('Method not allowed.', 405);
-  }
-
-  try {
-    const row = await getTokenRow();
-    if (row) {
-      await revokeToken(row.refresh_token);
+export default {
+  async fetch(request: Request): Promise<Response> {
+    if (request.method !== 'POST') {
+      return jsonError('Method not allowed.', 405);
     }
 
-    await deleteTokenRow();
+    try {
+      const row = await getTokenRow();
+      if (row) {
+        await revokeToken(row.refresh_token);
+      }
 
-    return jsonNoStore({ connected: false });
-  } catch (error) {
-    return toErrorResponse(error);
-  }
-}
+      await deleteTokenRow();
+
+      return jsonNoStore({ connected: false });
+    } catch (error) {
+      return toErrorResponse(error);
+    }
+  },
+};

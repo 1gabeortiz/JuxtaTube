@@ -1,0 +1,32 @@
+{
+  // Separate config for the /api folder because it runs in a fundamentally
+  // different place than the frontend: Node on Vercel, not a browser.
+  //
+  // The key setting is moduleResolution "nodenext", which makes TypeScript
+  // enforce Node's real ESM rules — most importantly that relative imports
+  // carry an explicit ".js" extension. The frontend uses "bundler" resolution
+  // where Vite rewrites those specifiers, so omitting extensions is fine there.
+  // Vercel compiles each API file straight to ESM and hands it to Node, which
+  // does not rewrite anything, so an extensionless import fails at runtime with
+  // ERR_MODULE_NOT_FOUND. Typechecking under nodenext turns that production
+  // crash into a local compile error.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "types": ["node"],
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true
+  },
+  "include": ["api"]
+}

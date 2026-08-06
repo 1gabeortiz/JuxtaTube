@@ -20,5 +20,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true
   },
-  "include": ["src", "api", "vite.config.ts"]
+  // The /api folder is checked separately by tsconfig.api.json, which applies
+  // Node's stricter ESM module rules instead of the bundler rules used here.
+  "include": ["src", "vite.config.ts"]
 }
