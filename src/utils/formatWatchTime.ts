@@ -11,7 +11,10 @@ export function formatWatchTime(minutes: number): string {
   if (minutes < 60) return `${Math.round(minutes)} min`;
 
   const hours = minutes / 60;
-  if (hours < 10) return `${hours.toFixed(1).replace(/\.0$/, '')} hrs`;
+  if (hours < 10) {
+    const rounded = hours.toFixed(1).replace(/\.0$/, '');
+    return `${rounded} ${rounded === '1' ? 'hr' : 'hrs'}`;
+  }
 
   return `${Math.round(hours).toLocaleString('en-US')} hrs`;
 }
