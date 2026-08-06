@@ -20,6 +20,32 @@ next upload, and whether the channels you compete with are pulling ahead.
 <img alt="React" src="https://img.shields.io/badge/React-19-149ECA?style=for-the-badge&logo=react&logoColor=white">
 <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-6-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
 
+<br />
+<br />
+
+<img src="docs/screenshots/overview.png" alt="Overview page — channel stats and recent uploads" width="900">
+
+<p><sub>Overview — live public stats and recent uploads</sub></p>
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="docs/screenshots/analytics.png" alt="Analytics page — charts for views, watch time, and audience">
+      <p align="center"><sub>Analytics</sub></p>
+    </td>
+    <td width="50%">
+      <img src="docs/screenshots/tags.png" alt="Tags page — suggestions and competitive tag explorer">
+      <p align="center"><sub>Tags</sub></p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">
+      <img src="docs/screenshots/competitors.png" alt="Competitors page — tracked channels and growth chart" width="900">
+      <p><sub>Competitors</sub></p>
+    </td>
+  </tr>
+</table>
+
 </div>
 
 <br />
