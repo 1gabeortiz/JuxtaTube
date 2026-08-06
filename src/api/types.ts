@@ -173,6 +173,8 @@ export interface AuthStatus {
   connected: boolean;
   /** ISO timestamp of when the connection was last written, or null. */
   connectedAt: string | null;
+  /** Whether the key sent with this request is the owner's. */
+  owner: boolean;
 }
 
 /**
