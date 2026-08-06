@@ -39,6 +39,36 @@ export interface VideosResponse {
   videos: VideoSummary[];
 }
 
+export interface TagSuggestion {
+  tag: string;
+  /** Video categories the tag is considered relevant to. Often empty. */
+  categoryRestricts: string[];
+}
+
+export interface TagSuggestions {
+  videoId: string;
+  videoTitle: string;
+  /** Tags already on the video, so you can compare against the suggestions. */
+  currentTags: string[];
+  suggestions: TagSuggestion[];
+}
+
+export interface TagFrequency {
+  tag: string;
+  /** How many of the scanned videos used this tag. */
+  count: number;
+}
+
+export interface TagExplorerResult {
+  mode: 'channel' | 'keyword';
+  /** Echo of what was searched, resolved to a channel title in channel mode. */
+  query: string;
+  videosScanned: number;
+  /** Data API units this request consumed, so the cost stays visible. */
+  quotaCost: number;
+  tags: TagFrequency[];
+}
+
 /** One day of channel performance. `date` is YYYY-MM-DD. */
 export interface AnalyticsDayPoint {
   date: string;
